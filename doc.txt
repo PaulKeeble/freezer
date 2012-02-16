@@ -1,0 +1,37 @@
+Pure functional is better, will use parallel threads to compensate for speed penalty
+Arrays of bytes are smaller and should form the interface, internally use lists of bytes for faster combination and manipulation
+Class structure wont be stored, we'll use the natural ordering
+
+Structure is thus:
+
+Table of Types
+==============
+index starts at 1, there is no zero
+index (implied by order) - Type (String null terminated) - serial code
+
+Table of Objects
+===============
+Table starts at 1, 0 for object reference means null
+1 is root object
+2> is sub objects
+index (implied by order) - Type reference (short)
+
+Stream of objects
+================
+Objects one after the other
+Object = declared fields* - in natural order, child first
+
+Fields
+-------
+String = length, bytes as UTF-8
+byte/short/int/long/float/double/char/boolean = bytes needed
+Object Reference = int into table of objects | 0 for null
+
+
+
+
+
+
+Special cases on interface - null, primitives
+null is dealt with by empty result, primitives punting until later
+
