@@ -6,6 +6,7 @@ import freezer.obj.TypeRegister
 import freezer.serialisers.IntSerialiser
 import freezer.serialisers.TypeRegisterSerialiser
 import scala.collection.mutable.ArrayBuilder
+import freezer.obj.ObjectGraph
 
 class Freezer {
   
@@ -13,24 +14,31 @@ class Freezer {
     if (obj == null) return Array()
     
     val builder = ArrayBuilder.make[Byte]
+    builder++=types(obj)
     
-    val typeRegister = new TypeRegister()
-    typeRegister += obj.getClass()
-    builder++= new TypeRegisterSerialiser().store(typeRegister)
-    
-    val fields = obj.getClass().getDeclaredFields()
-    val allFields = fields.map {f => toBytes(f,obj)}
-    
-    builder ++=allFields.flatten
+    builder ++=serialiseObject(obj).flatten
     builder.result()
   }
   
-  private def toBytes(f : Field, obj : Any) : Array[Byte] = {
+  def types(obj : AnyRef) ={
+    val typeRegister = new TypeRegister()
+    val objGraph = new ObjectGraph(obj)
+    typeRegister ++= objGraph.getAll.map {_.getClass()}
+    
+    new TypeRegisterSerialiser().store(typeRegister)
+  }
+  
+  private def serialiseField(f : Field, obj : Any) : Array[Byte] = {
     f.setAccessible(true)
     val value = f.get(obj)
     val asInt = value.asInstanceOf[Int]
     val bytes = new IntSerialiser().store(asInt)
     bytes
+  }
+  
+  private def serialiseObject(root: AnyRef) : Array[Array[Byte]] = {
+    val fields = root.getClass().getDeclaredFields()
+    fields.map {f => serialiseField(f,root)}
   }
   
   def unfreeze(frozen : Array[Byte]) : AnyRef = {

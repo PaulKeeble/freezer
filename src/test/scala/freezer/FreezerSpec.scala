@@ -30,11 +30,14 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen {
       
       when("frozen and unfrozen")
       val stored : Array[Byte] = freezer.freeze(obj)
+      val s = new String(stored,"UTF-8")
       val result = freezer.unfreeze(stored)
       
       then("the original field is 1 and the object is of the correct type")
       expect(1) { result.asInstanceOf[IntObject].i }
     }
+    
+    
   }
   
   //null
