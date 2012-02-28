@@ -30,17 +30,25 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen {
       
       when("frozen and unfrozen")
       val stored : Array[Byte] = freezer.freeze(obj)
-      val s = new String(stored,"UTF-8")
       val result = freezer.unfreeze(stored)
       
       then("the original field is 1 and the object is of the correct type")
       expect(1) { result.asInstanceOf[IntObject].i }
     }
     
+    scenario("long") {
+      given("an object with a long field and value 1")
+      val obj = new LongObject(1)
+      
+      when("frozen and unfrozen")
+      val stored : Array[Byte] = freezer.freeze(obj)
+      val result = freezer.unfreeze(stored)
+      
+      then("the original field is 1 and the object is of the correct type")
+      expect(1L) { result.asInstanceOf[LongObject].i }
+    }
     
   }
-  
-  //null
   
   //simple structured object
   
@@ -50,6 +58,8 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen {
   
   //arrays
  
+  //private no arg constructor
+  
   //Java lists, sets, maps
   
   //Scala lists, sets, maps
@@ -57,8 +67,13 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen {
   //scala enumerations
   
   //java enumerations
+  
 }
 
 class IntObject(val i:Int) {
+  def this() = this(0)
+}
+
+class LongObject(val i:Long) {
   def this() = this(0)
 }
