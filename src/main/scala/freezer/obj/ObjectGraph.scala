@@ -1,5 +1,6 @@
 package freezer.obj
 import java.lang.reflect.Field
+
 import scala.collection.mutable
 
 class ObjectGraph(val root:AnyRef) {
@@ -21,6 +22,10 @@ class ObjectGraph(val root:AnyRef) {
     foundObjects.toList
   }
   
+  def types = new TypeRegister ++= getAll.map { _.getClass}
+  
+  def index = new ObjectIndex ++= getAll.map { SystemReference(_)}
+  
   private def objectFields(obj : AnyRef) : Seq[AnyRef] = {
     val anyRefFieldValues = obj.getClass().getDeclaredFields().filter { field => isObject(field, obj)}.map { f =>
       f.setAccessible(true)
@@ -34,8 +39,7 @@ class ObjectGraph(val root:AnyRef) {
     field.setAccessible(true)
     val value = field.get(obj)
     
-    val isObject = !primitives.isDefinedAt(value)
-    isObject
+    !primitives(value)
   }
   
   private def primitives :PartialFunction[Any,Boolean]=  {
@@ -48,6 +52,6 @@ class ObjectGraph(val root:AnyRef) {
     case d : Double => true
     case c : Char => true
     case s : String => true
+    case _ => false
   }
-  
 }

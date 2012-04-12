@@ -28,6 +28,17 @@ class DefaultInlineSerialisersSpec extends FunSpec with ShouldMatchers {
     }
     
     describe("when deserialising") {
+      it("should read last byte") {
+        val stored = Array[Byte](1)
+        val serialiserType = classOf[Byte].getName()
+        
+        deserialisers.isDefinedAt(serialiserType,stored) should be(true)
+        
+        val loaded = deserialisers(serialiserType,stored)
+        loaded.result should equal (1.byteValue)
+        loaded.remaining should equal (Array())
+      }
+      
       it("should read last int") {
         val stored = Array[Byte](0,0,0,1)
         val serialiserType = classOf[Int].getName()
