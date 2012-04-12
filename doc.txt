@@ -1,19 +1,20 @@
 Pure functional is better, will use parallel threads to compensate for speed penalty
-Arrays of bytes are smaller and should form the interface, internally use lists of bytes for faster combination and manipulation
+Arrays of bytes are smaller and should form the interface
 Class structure wont be stored, we'll use the natural ordering
 
 Structure is thus:
 
 Table of Types
 ==============
-index starts at 1, there is no zero
+index starts at 0
 index (implied by order) - Type (String null terminated) - serial code
 
 Table of Objects
 ===============
-Table starts at 1, 0 for object reference means null
-1 is root object
-2> is sub objects
+-1 reference is null
+Table starts at 0
+0 is root object
+1> is sub objects
 index (implied by order) - Type reference (short)
 
 Stream of objects
@@ -25,13 +26,13 @@ Fields
 -------
 String = length, bytes as UTF-8
 byte/short/int/long/float/double/char/boolean = bytes needed
-Object Reference = int into table of objects | 0 for null
+Object Reference = int into table of objects | -1 for null
 
-
-
-
-
+Future scope
+==============
+Refactor the Deserialisation process so that objects can be done in parallel rather than serially
+Improve performance of index lookup and object index lookup in ObjectIndex
+Add parallel execution to the serialisation process to speed it up
 
 Special cases on interface - null, primitives
 null is dealt with by empty result, primitives punting until later
-
