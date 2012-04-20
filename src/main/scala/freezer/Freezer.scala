@@ -17,42 +17,12 @@ import freezer.serialisers.ObjectIndexSerialiser
 import freezer.serialisers.ObjectReferenceSerialiser
 
 class Freezer {
-  def freeze(obj : AnyRef) : Array[Byte] = {
+  def freeze(obj : AnyRef) :Array[Byte] = {
     if (obj == null) return Array()
     
-    val builder = ArrayBuilder.make[Byte]
-    
     val objGraph = new ObjectGraph(obj)
-    builder++=types(objGraph)
-    builder++=index(objGraph)
     
-    builder ++=serialiseObjectGraph(objGraph)
-    builder.result()
-  }
-  
-  private def types(objGraph : ObjectGraph) ={
-    new TypeRegisterSerialiser().store(objGraph.types)
-  }
-  
-  private def index(objGraph:ObjectGraph) = {
-    new ObjectIndexSerialiser(objGraph.types).store(objGraph.index)
-  }
-  
-  private def serialiseObjectGraph(objGraph:ObjectGraph) : Array[Byte] = {
-    val index = objGraph.index
-    val bytesForObjects=objGraph.getAll.toArray.map {serialiseObject(_,index)}
-    bytesForObjects.flatten
-  }
-  
-  private def serialiseObject(root: AnyRef, index: ObjectIndex) : Array[Byte] = {
-    val objectRefFunction :PartialFunction[Any,Array[Byte]] = { 
-      a :Any => a match {
-      	case b : AnyRef => new ObjectReferenceSerialiser(index).store(b)
-      }
-    }
-    val serialisationFunction = DefaultInlineSerialisers.serialisers.orElse({objectRefFunction}).lift
-    
-    new FreezeProcess(serialisationFunction).serialiseObject(root).flatten
+    new FreezeProcess().freeze(objGraph)
   }
   
   def unfreeze(frozen : Array[Byte]) : AnyRef = {

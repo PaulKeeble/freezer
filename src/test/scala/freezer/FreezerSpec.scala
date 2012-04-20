@@ -4,6 +4,7 @@ import org.scalatest.FeatureSpec
 import org.junit.runner.RunWith
 import org.scalatest.GivenWhenThen
 import org.scalatest.junit.JUnitRunner
+import scala.util.control.TailCalls.TailRec
 
 @RunWith(classOf[JUnitRunner])
 class FreezerSpec extends FeatureSpec with GivenWhenThen {
@@ -67,6 +68,8 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen {
     //double
     
     //char
+    
+    //multiple primitives
   }
   
   feature("Freezing object graphs") {
@@ -80,6 +83,23 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen {
       
       then("the sub object is recreated correctly")
       expect(1) { result.asInstanceOf[ObjectObject].o.i }
+    }
+    
+    scenario("deep graph") {
+      given("A deep object graph")
+      val end = new DeepObject
+      var current = end
+      
+      1 to 10000 foreach { _=>
+        current = new DeepObject(current)
+      }
+      
+      when("frozen and unfrozen")
+      val stored : Array[Byte] = freezer.freeze(current)
+      val result = freezer.unfreeze(stored)
+      
+      then("the graph is recreated correctly")
+      expect(10000) { result.asInstanceOf[DeepObject].depth}
     }
   }
   //simple structured object
@@ -104,7 +124,7 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen {
   
   //java enumerations
   
-  //run parallel freezes using the same Freezer
+  //run parallel using the same Freezer
   
 }
 
@@ -122,4 +142,17 @@ class ByteObject(val i:Byte) {
 
 class ObjectObject(val o:IntObject) {
   def this() = this(null)
+}
+
+class DeepObject(o : DeepObject) {
+  def this() = this(null)
+  
+  def depth :Int = depth(0)
+  
+  def depth(count : Int) :Int =  {
+    if( o == null)
+      count 
+    else 
+      depth(count+1) 
+  }
 }
