@@ -53,7 +53,7 @@ class Freezer {
         remainingBytes = read.remaining
       }
     }
-    objectIndex.first.obj
+    objectIndex.head.obj
   }
   
   private def fromBytes(clazz : Class[_],bytes : Array[Byte],deserialiseFunction : Function[(String,Array[Byte]),Option[LoadResult[Any]]]) : LoadResult[Any]  = {
