@@ -20,7 +20,9 @@ class ObjectReferenceSerialiser(val index:ObjectIndex) extends Serialiser[AnyRef
     if(loadResult.result == NULL)
       return new LoadResult(null,loadResult.remaining)
     
-    index.atIndex(loadResult.result) match {
+    val objIndex = loadResult.result
+    
+    index.atIndex(objIndex) match {
       case Some(obj) =>  new LoadResult(obj.obj,loadResult.remaining)
       case None => throw new ObjectLookupException("Unable to reference existing object, programming error")
     }

@@ -37,7 +37,7 @@ class Freezer {
     var remainingBytes = indexResult.remaining
 
     val deserialiseObject:PartialFunction[(String,Array[Byte]),LoadResult[Any]]= { a => a match {
-      	case (_,bytes)  => new ObjectReferenceSerialiser(objectIndex).load(bytes)
+      	case (_:AnyRef,bytes)  => new ObjectReferenceSerialiser(objectIndex).load(bytes)
       }
     }
     
@@ -52,7 +52,6 @@ class Freezer {
         f.set(obj,read.result)
         remainingBytes = read.remaining
       }
-      
     }
     objectIndex.first.obj
   }

@@ -7,7 +7,7 @@ class OrderedConcurrentSet[A] extends LinkedHashSet[A] with SynchronizedSet[A] {
     if (!contains(ref))
       return None
 
-    val index = toList.findIndexOf(_==ref)
+    val index = toList.findIndexOf(_==ref)  //Number one bottleneck of depth graph is this toList
     Some(index)
   }
   

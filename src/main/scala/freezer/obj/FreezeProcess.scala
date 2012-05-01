@@ -32,6 +32,7 @@ class FreezeProcess() {
       a: Any =>
         a match {
           case b: AnyRef => new ObjectReferenceSerialiser(index).store(b)
+          case null => new ObjectReferenceSerialiser(index).store(null)
         }
     }
     val serialisationFunction = DefaultInlineSerialisers.serialisers.orElse({ objectRefFunction }).lift
