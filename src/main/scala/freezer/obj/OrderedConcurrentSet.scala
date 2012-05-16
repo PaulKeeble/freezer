@@ -22,12 +22,12 @@ class OrderedConcurrentSet[A] extends LinkedHashSet[A] with SynchronizedSet[A] {
   }
 
   override def equals(other:Any) :Boolean = other match {
-    case that : OrderedConcurrentSet[A] => (that canEqual this) &&
+    case that : OrderedConcurrentSet[_] => (that canEqual this) &&
     	sameElements( that)
     case _ => false
   }
   
   override def hashCode():Int = toList.hashCode
   
-  override def canEqual(other:Any) :Boolean = other.isInstanceOf[OrderedConcurrentSet[A]] && super.canEqual(other)
+  override def canEqual(other:Any) :Boolean = other.isInstanceOf[OrderedConcurrentSet[_]] && super.canEqual(other)
 }

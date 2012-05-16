@@ -10,7 +10,6 @@ import freezer.obj.ObjectGraph
 import freezer.serialisers.Serialiser
 import freezer.serialisers.DefaultInlineSerialisers
 import freezer.serialisers.LoadResult
-import freezer.obj.FreezeProcess
 import freezer.obj.ObjectIndex
 import freezer.obj.SystemReference
 import freezer.serialisers.ObjectIndexSerialiser
@@ -21,8 +20,11 @@ class Freezer {
     if (obj == null) return Array()
     
     val objGraph = new ObjectGraph(obj)
-    
-    new FreezeProcess().freeze(objGraph)
+
+    val serialisationFunction = DefaultInlineSerialisers.serialisePrimitive.
+      orElse({ DefaultInlineSerialisers.serialiseObject(objGraph.index) }).lift
+
+    objGraph.freeze(serialisationFunction)
   }
   
   def unfreeze(frozen : Array[Byte]) : AnyRef = {
@@ -35,13 +37,8 @@ class Freezer {
     val objectIndex = indexResult.result
     
     var remainingBytes = indexResult.remaining
-
-    val deserialiseObject:PartialFunction[(String,Array[Byte]),LoadResult[Any]]= { a => a match {
-      	case (_:AnyRef,bytes)  => new ObjectReferenceSerialiser(objectIndex).load(bytes)
-      }
-    }
     
-    val deserialiseFunction = DefaultInlineSerialisers.deserialisers.orElse(deserialiseObject).lift
+    val deserialiseFunction = DefaultInlineSerialisers.deserialisePrimitive.orElse(DefaultInlineSerialisers.deserialiseObject(objectIndex)).lift
     
     objectIndex.foreach { o =>
       val obj = o.obj
