@@ -6,7 +6,7 @@ import freezer.serialisers.TypeRegisterSerialiser
 import freezer.serialisers.ObjectIndexSerialiser
 
 class ObjectGraph(val root:AnyRef) {
-  def getAll = {
+  def allObjects = {
     var q = new mutable.Queue[AnyRef]
 	var foundObjects = mutable.LinkedHashSet[AnyRef]()
 
@@ -24,9 +24,9 @@ class ObjectGraph(val root:AnyRef) {
     foundObjects.toList
   }
   
-  def types = new TypeRegister ++= getAll.map { _.getClass}
+  def types = new TypeRegister ++= allObjects.map { _.getClass}
   
-  def index = new ObjectIndex ++= getAll.map { SystemReference(_)}
+  def index = new ObjectIndex ++= allObjects.map { SystemReference(_)}
   
   def freeze(serialisationFunction : (Any) => Option[Array[Byte]]): Array[Byte] = {
     val builder = ArrayBuilder.make[Byte]

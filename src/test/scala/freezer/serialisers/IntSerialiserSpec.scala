@@ -26,9 +26,25 @@ class IntSerialiserSpec extends FunSpec with ShouldMatchers{
       roundtrip(Int.MaxValue)
     }
     
-    it("should save Intger min value") {
+    it("should save Integer min value") {
       roundtrip(Int.MinValue)		
     }
+    
+    it("should save 01010101 hex") {
+      roundtrip(0x01010101)
+    }
+    
+    it("should save 80808080 hex") {
+      val pow2 = pow(2,_:Int)
+      
+      roundtrip(0x80808080)
+    }
+  }
+  
+  def pow(n:Int,e:Int) : Int = {
+    if(e==0) 1 
+    else if (e==1) n 
+    else n*pow(n,e-1)
   }
   
   def roundtrip(i : Int) {

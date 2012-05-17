@@ -81,7 +81,7 @@ class ObjectGraphSpec extends FunSpec with ShouldMatchers {
   
   def allInGraph(root : AnyRef) = {
     val graph = new ObjectGraph(root)
-    graph.getAll
+    graph.allObjects
   }
 }
 

@@ -28,5 +28,13 @@ class LongSerialiserSpec extends FunSpec with RoundTrip[Long] with ShouldMatcher
     it("should save max negative long") {
       roundTrip(Long.MinValue)
     }
+    
+    it("should save 0101010101") {
+      roundTrip(0x0101010101L)
+    }
+    
+    it("should save 80808080") {
+      roundTrip(0x80808080L)
+    }
   }
 }

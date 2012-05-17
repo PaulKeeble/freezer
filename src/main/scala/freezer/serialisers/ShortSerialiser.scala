@@ -12,7 +12,7 @@ class ShortSerialiser extends Serialiser[Short]{
     case Array(b0,b1,_*) => {
 	    val i : Short = 
 	      ((b0 << 8) |
-	       b1 & 0xFF).shortValue()
+	       (b1 & 0xFF)).shortValue()
 	    
 	    new LoadResult(i,stored.drop(4))
     }

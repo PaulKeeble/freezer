@@ -139,7 +139,7 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
       expect(2) { resultO.b.asInstanceOf[IntObject].i }
     }
     
-    ignore("deep graph") {
+    scenario("deep graph") {
       given("A deep object graph")
       val end = new DeepObject()
       var current = end
@@ -155,7 +155,7 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
       then("the graph is recreated correctly")
       val resultO = result.asInstanceOf[DeepObject]
       assert(resultO != resultO.o,"Objects are not unique")
-      expect(10000) { result.asInstanceOf[DeepObject].depth}
+      expect(10001) { result.asInstanceOf[DeepObject].depth}
     }
     //wide shallow graph
   

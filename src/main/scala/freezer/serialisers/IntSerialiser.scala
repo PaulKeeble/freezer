@@ -12,9 +12,9 @@ class IntSerialiser extends Serialiser[Int] {
     case Array(b0,b1,b2,b3,_*) => {
 	    val i = 
 	      (b0 << 24) |
-	      (b1 & 0xFF << 16 ) |
-	      (b2 & 0xFF <<  8) |
-	       b3 & 0xFF
+	      ((b1 & 0xFF) << 16 ) |
+	      ((b2 & 0xFF) <<  8) |
+	       (b3 & 0xFF)
 	    
 	    new LoadResult(i,stored.drop(4))
     }

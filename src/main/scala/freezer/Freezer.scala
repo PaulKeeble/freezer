@@ -33,7 +33,7 @@ class Freezer {
     val registerResult = new TypeRegisterSerialiser().load(frozen)
     val typeRegister = registerResult.result
     
-    val indexResult = new ObjectIndexSerialiser(registerResult.result).load(registerResult.remaining)
+    val indexResult = new ObjectIndexSerialiser(typeRegister).load(registerResult.remaining)
     val objectIndex = indexResult.result
     
     var remainingBytes = indexResult.remaining
