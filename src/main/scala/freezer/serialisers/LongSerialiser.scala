@@ -13,19 +13,21 @@ class LongSerialiser extends Serialiser[Long]{
            i.toByte)
   }
   
-  def load(stored : Array[Byte]) : LoadResult[Long] = stored match {
-    case Array(b0,b1,b2,b3,b4,b5,b6,b7,_*) => {
-	    val i :Long = (b0 << 56L ) |
-	      ((b1 & 0xFF).toLong << 48L ) |
-	      ((b2 & 0xFF).toLong << 40L ) |
-	      ((b3 & 0xFF).toLong << 32L ) |
-	      ((b4 & 0xFF).toLong << 24L ) |
-	      ((b5 & 0xFF).toLong << 16L ) |
-	      ((b6 & 0xFF).toLong <<  8L) |
-	       (b7 & 0xFF)
+  def load(stored : Array[Byte]) : LoadResult[Long] = {
+    if(stored.length>=8) {
+      val i :Long = (stored(0) << 56L ) |
+	      ((stored(1) & 0xFF).toLong << 48L ) |
+	      ((stored(2) & 0xFF).toLong << 40L ) |
+	      ((stored(3) & 0xFF).toLong << 32L ) |
+	      ((stored(4) & 0xFF).toLong << 24L ) |
+	      ((stored(5) & 0xFF).toLong << 16L ) |
+	      ((stored(6) & 0xFF).toLong <<  8L) |
+	       (stored(7) & 0xFF)
 	    
 	    new LoadResult(i,stored.drop(8))
     }
-    case _ => new LoadResult(0L,stored) 
+    else {
+      new LoadResult(0L,stored) 
+    }
   }
 }

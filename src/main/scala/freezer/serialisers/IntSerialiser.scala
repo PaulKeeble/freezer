@@ -8,16 +8,17 @@ class IntSerialiser extends Serialiser[Int] {
            i.toByte)
   }
   
-  def load(stored : Array[Byte]) : LoadResult[Int] = stored match {
-    case Array(b0,b1,b2,b3,_*) => {
-	    val i = 
-	      (b0 << 24) |
-	      ((b1 & 0xFF) << 16 ) |
-	      ((b2 & 0xFF) <<  8) |
-	       (b3 & 0xFF)
-	    
-	    new LoadResult(i,stored.drop(4))
+  def load(stored : Array[Byte]) : LoadResult[Int] = {
+    if(stored.length>=4) {
+      val i = 
+	      (stored(0) << 24) |
+	      ((stored(1) & 0xFF) << 16 ) |
+	      ((stored(2) & 0xFF) <<  8) |
+	       (stored(3) & 0xFF)
+	  new LoadResult(i,stored.drop(4))
     }
-    case _ => new LoadResult(0,stored) 
+    else {
+      new LoadResult(0,stored) 
+    }
   }
 }

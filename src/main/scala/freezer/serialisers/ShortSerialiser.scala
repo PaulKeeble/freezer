@@ -8,14 +8,15 @@ class ShortSerialiser extends Serialiser[Short]{
     )
   }
   
-  def load(stored:Array[Byte]) : LoadResult[Short] = stored match  {
-    case Array(b0,b1,_*) => {
-	    val i : Short = 
-	      ((b0 << 8) |
-	       (b1 & 0xFF)).shortValue()
-	    
-	    new LoadResult(i,stored.drop(4))
+  def load(stored:Array[Byte]) : LoadResult[Short] = {
+    if(stored.length >=2) {
+       val i : Short = 
+	      ((stored(0) << 8) |
+	       (stored(1) & 0xFF)).shortValue()
+	   new LoadResult(i,stored.drop(4))
     }
-    case _ => new LoadResult(0.shortValue,stored) 
+    else {
+    	new LoadResult(0.shortValue,stored) 
+    }   
   }
 }
