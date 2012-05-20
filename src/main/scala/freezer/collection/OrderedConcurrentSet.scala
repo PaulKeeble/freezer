@@ -9,35 +9,24 @@ import scala.collection.script.Message
 class OrderedConcurrentSet[A] extends LinkedHashSet[A] with ObservableSet[A] with SynchronizedSet[A]  {
   val sub = new Sub {
     def notify(pub:Pub,event:Message[A] with Undoable) {
-      cache = None
+      indexToObject.reset()
+      objectToIndex.reset()
     }
   }
   subscribe(sub)
   
-  var cache : Option[IndexedSeq[A]] = None
-  
-  def cachedToIndexedSeq = {
-    cache match {
-      case Some(list) => list
-      
-      case None => {
-        val list= toIndexedSeq
-        cache = Some(list)
-        list
-      }
-    }
-  }
+  val indexToObject = new Cached(toIndexedSeq)
+  val objectToIndex = new Cached(zipWithIndex.toMap)
   
   def indexOf(ref: A): Option[Int] = {
     if (!contains(ref))
       return None
-
-    val index = cachedToIndexedSeq.indexWhere(_==ref)  //Number one bottleneck of depth graph is this toList
-    Some(index)
+    val map = objectToIndex()
+    Some(map(ref))
   }
   
   def atIndex(index :Int) : Option[A] = {
-    val list = cachedToIndexedSeq
+    val list = indexToObject()
     
     index match {
       case i if i >list.size-1 => None
@@ -52,7 +41,7 @@ class OrderedConcurrentSet[A] extends LinkedHashSet[A] with ObservableSet[A] wit
     case _ => false
   }
   
-  override def hashCode():Int = cachedToIndexedSeq.hashCode
+  override def hashCode():Int = indexToObject().hashCode
   
   override def canEqual(other:Any) :Boolean = other.isInstanceOf[OrderedConcurrentSet[_]] && super.canEqual(other)
 }

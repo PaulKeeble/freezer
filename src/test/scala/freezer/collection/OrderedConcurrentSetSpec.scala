@@ -5,7 +5,6 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 
-
 @RunWith(classOf[JUnitRunner])
 class OrderedConcurrentSetSpec extends FunSpec with ShouldMatchers with BeforeAndAfter{
   val set = new OrderedConcurrentSet[Object]

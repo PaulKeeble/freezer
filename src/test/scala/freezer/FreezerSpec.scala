@@ -12,7 +12,6 @@ import org.scalatest.matchers.ShouldMatchers
 class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
   val freezer = new Freezer
   feature("Freezing null") {
-    
     scenario("null") {
       given("a null variable")
       val x = null
