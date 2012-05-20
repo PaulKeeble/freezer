@@ -14,6 +14,7 @@ import freezer.obj.ObjectIndex
 import freezer.obj.SystemReference
 import freezer.serialisers.ObjectIndexSerialiser
 import freezer.serialisers.ObjectReferenceSerialiser
+import freezer.collection.ArrayView
 
 class Freezer {
   def freeze(obj : AnyRef) :Array[Byte] = {
@@ -53,7 +54,7 @@ class Freezer {
     objectIndex.head.obj
   }
   
-  private def fromBytes(clazz : Class[_],bytes : Array[Byte],deserialiseFunction : Function[(String,Array[Byte]),Option[LoadResult[Any]]]) : LoadResult[Any]  = {
+  private def fromBytes(clazz : Class[_],bytes : ArrayView[Byte],deserialiseFunction : Function[(String,ArrayView[Byte]),Option[LoadResult[Any]]]) : LoadResult[Any]  = {
     deserialiseFunction(clazz.getName(),bytes) match {
       case Some(x) => x
       case None => throw new RuntimeException("Type " + clazz +" not supported")

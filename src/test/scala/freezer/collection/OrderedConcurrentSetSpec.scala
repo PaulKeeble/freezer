@@ -1,11 +1,10 @@
-package freezer.obj
+package freezer.collection
 import org.junit.runner.RunWith
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.BeforeAndAfter
 import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.BeforeAndAfter
 
-import SystemReference._
 
 @RunWith(classOf[JUnitRunner])
 class OrderedConcurrentSetSpec extends FunSpec with ShouldMatchers with BeforeAndAfter{

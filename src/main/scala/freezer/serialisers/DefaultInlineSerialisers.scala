@@ -1,5 +1,6 @@
 package freezer.serialisers
 import freezer.obj.ObjectIndex
+import freezer.collection.ArrayView
 object DefaultInlineSerialisers {
   
   def serialiseObject(index : ObjectIndex) : PartialFunction[Any,Array[Byte]] = {
@@ -13,11 +14,11 @@ object DefaultInlineSerialisers {
     case b :Byte => new ByteSerialiser().store(b)
   }
   
-  def deserialiseObject(index : ObjectIndex) : PartialFunction[(String,Array[Byte]),LoadResult[Any]] = {
+  def deserialiseObject(index : ObjectIndex) : PartialFunction[(String,ArrayView[Byte]),LoadResult[Any]] = {
     case (_,a) => new ObjectReferenceSerialiser(index).load(a)
   }
   
-  def deserialisePrimitive : PartialFunction[(String,Array[Byte]),LoadResult[Any]] = {
+  def deserialisePrimitive : PartialFunction[(String,ArrayView[Byte]),LoadResult[Any]] = {
     case ("int",a) => new IntSerialiser().load(a)
     case ("long",a) => new LongSerialiser().load(a)
     case ("byte",a) => new ByteSerialiser().load(a)

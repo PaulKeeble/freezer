@@ -1,10 +1,10 @@
-package freezer.obj
+package freezer.collection
 import scala.collection.mutable.LinkedHashSet
 import scala.collection.mutable.ObservableSet
 import scala.collection.mutable.Subscriber
 import scala.collection.mutable.SynchronizedSet
-import scala.collection.script.Message
 import scala.collection.mutable.Undoable
+import scala.collection.script.Message
 
 class OrderedConcurrentSet[A] extends LinkedHashSet[A] with ObservableSet[A] with SynchronizedSet[A]  {
   val sub = new Sub {
