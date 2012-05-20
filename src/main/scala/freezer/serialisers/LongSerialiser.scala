@@ -1,4 +1,5 @@
 package freezer.serialisers
+import freezer.collection.ArrayView
 
 class LongSerialiser extends Serialiser[Long]{
   def store(i :Long) : Array[Byte] = {
@@ -13,7 +14,7 @@ class LongSerialiser extends Serialiser[Long]{
            i.toByte)
   }
   
-  def load(stored : Array[Byte]) : LoadResult[Long] = {
+  def load(stored : ArrayView[Byte]) : LoadResult[Long] = {
     if(stored.length>=8) {
       val i :Long = (stored(0) << 56L ) |
 	      ((stored(1) & 0xFF).toLong << 48L ) |

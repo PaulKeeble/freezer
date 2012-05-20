@@ -37,7 +37,7 @@ class DefaultInlineSerialisersSpec extends FunSpec with ShouldMatchers {
         
         val loaded = deserialisers(serialiserType,stored)
         loaded.result should equal (1.byteValue)
-        loaded.remaining should equal (Array())
+        loaded.remaining ===Array()
       }
       
       it("should read last int") {
@@ -48,7 +48,7 @@ class DefaultInlineSerialisersSpec extends FunSpec with ShouldMatchers {
         
         val loaded = deserialisers(serialiserType,stored)
         loaded.result should equal (1)
-        loaded.remaining should equal (Array())
+        loaded.remaining ===Array()
       }
     }
   }
@@ -91,7 +91,7 @@ class DefaultInlineSerialisersSpec extends FunSpec with ShouldMatchers {
         
         val loaded = deserialiseObject(serialiserType,stored)
         loaded.result should equal (o)
-        loaded.remaining should equal (Array())
+        loaded.remaining ===Array()
       }
       
       it("should convert null references") {
@@ -106,7 +106,7 @@ class DefaultInlineSerialisersSpec extends FunSpec with ShouldMatchers {
         
         val loaded = deserialiseObject(serialiserType,stored)
         loaded.result should equal (null)
-        loaded.remaining should equal (Array())
+        loaded.remaining ===Array()
       }
     }
   }

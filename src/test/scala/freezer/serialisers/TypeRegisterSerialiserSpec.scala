@@ -7,7 +7,7 @@ import freezer.obj.TypeRegister
 import org.scalatest.BeforeAndAfter
 
 @RunWith(classOf[JUnitRunner])
-class TypeRegisterSerialiserSpec extends FunSpec with ShouldMatchers with BeforeAndAfter{
+class TypeRegisterSerialiserSpec extends FunSpec with ShouldMatchers with BeforeAndAfter with RoundTrip[TypeRegister]{
   
   var register :TypeRegister = _
   val serialiser = new TypeRegisterSerialiser
@@ -42,16 +42,16 @@ class TypeRegisterSerialiserSpec extends FunSpec with ShouldMatchers with Before
       val loaded = serialiser.load(stored ++ Array[Byte](1,2,3))
 
       loaded.result should equal(register)
-      loaded.remaining should equal(Array(1,2,3))
+      loaded.remaining ===Array(1,2,3)
     }
     
   }
-  
-  def roundTrip(r : TypeRegister) {
-    val stored = serialiser.store(register)
-    val loaded = serialiser.load(stored)
-    
-    loaded.result should equal (register)
-    loaded.remaining should equal (Array())
-  }
+//  
+//  def roundTrip(r : TypeRegister) {
+//    val stored = serialiser.store(register)
+//    val loaded = serialiser.load(stored)
+//    
+//    loaded.result should equal (register)
+//    loaded.remaining should equal (Array())
+//  }
 }

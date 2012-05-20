@@ -9,6 +9,6 @@ trait RoundTrip[T] extends ShouldMatchers {
     val loaded = serialiser.load(stored)
     
     loaded.result should equal (value)
-    loaded.remaining should equal (Array())
+    loaded.remaining === Array()
   }
 }

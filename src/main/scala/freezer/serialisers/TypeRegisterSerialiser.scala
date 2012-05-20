@@ -1,6 +1,7 @@
 package freezer.serialisers
 import freezer.obj.TypeRegister
 import scala.collection.mutable.ArrayBuilder
+import freezer.collection.ArrayView
 
 class TypeRegisterSerialiser extends Serialiser[TypeRegister] {
   private val stringSerialiser = new StringSerialiser
@@ -17,7 +18,7 @@ class TypeRegisterSerialiser extends Serialiser[TypeRegister] {
     builder.result
   }
 
-  def load(stored: Array[Byte]): LoadResult[TypeRegister] = {
+  def load(stored: ArrayView[Byte]): LoadResult[TypeRegister] = {
     val sizeResult = intSerialiser.load(stored)
     val numberEntries = sizeResult.result
 

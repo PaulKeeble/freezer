@@ -3,9 +3,13 @@ import freezer.obj.ObjectIndex
 import freezer.obj.TypeRegister
 import scala.collection.mutable.ArrayBuilder
 import freezer.obj.SystemReference
+import freezer.collection.ArrayView
 
 class ObjectIndexSerialiser(private val types :TypeRegister) extends Serialiser[ObjectIndex]{
   val intSerialiser = new IntSerialiser
+  
+  private val empty = Array[Class[_]]()
+  private val emptyObj = Array[AnyRef]()
   
   def store(index:ObjectIndex) : Array[Byte] = {
     
@@ -29,7 +33,7 @@ class ObjectIndexSerialiser(private val types :TypeRegister) extends Serialiser[
       }
   }
   
-  def load(stored: Array[Byte]) : LoadResult[ObjectIndex] = {
+  def load(stored: ArrayView[Byte]) : LoadResult[ObjectIndex] = {
     val entriesRead = intSerialiser.load(stored)
     val numberEntries = entriesRead.result
     var entriesStored = entriesRead.remaining
@@ -50,8 +54,6 @@ class ObjectIndexSerialiser(private val types :TypeRegister) extends Serialiser[
   }
   
   private def newObject(clazz: Class[_]) :AnyRef = {
-    val empty = Array[Class[_]]()
-    val emptyObj = Array[AnyRef]()
     try {
 	    val con = clazz.getDeclaredConstructor(empty:_*)
 	    con.setAccessible(true)

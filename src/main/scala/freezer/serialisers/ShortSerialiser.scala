@@ -1,4 +1,5 @@
 package freezer.serialisers
+import freezer.collection.ArrayView
 
 class ShortSerialiser extends Serialiser[Short]{
   def store(i : Short) : Array[Byte] = {
@@ -8,7 +9,7 @@ class ShortSerialiser extends Serialiser[Short]{
     )
   }
   
-  def load(stored:Array[Byte]) : LoadResult[Short] = {
+  def load(stored:ArrayView[Byte]) : LoadResult[Short] = {
     if(stored.length >=2) {
        val i : Short = 
 	      ((stored(0) << 8) |

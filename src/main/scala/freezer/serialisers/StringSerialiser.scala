@@ -1,4 +1,5 @@
 package freezer.serialisers
+import freezer.collection.ArrayView
 
 class StringSerialiser extends Serialiser[String]{
   val encoding="UTF-8"
@@ -8,7 +9,7 @@ class StringSerialiser extends Serialiser[String]{
     ints.store(s.length()) ++  s.getBytes(encoding).toList
   }
   
-  def load(stored: Array[Byte]) : LoadResult[String] = {
+  def load(stored: ArrayView[Byte]) : LoadResult[String] = {
     val lengthLoaded = ints.load(stored)
     
     val (strBytes,remainingMessage) = lengthLoaded.remaining.splitAt(lengthLoaded.result)

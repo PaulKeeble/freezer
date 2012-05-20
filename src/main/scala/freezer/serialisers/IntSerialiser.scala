@@ -1,4 +1,5 @@
 package freezer.serialisers
+import freezer.collection.ArrayView
 
 class IntSerialiser extends Serialiser[Int] {
   def store(i : Int) : Array[Byte] = {
@@ -8,7 +9,7 @@ class IntSerialiser extends Serialiser[Int] {
            i.toByte)
   }
   
-  def load(stored : Array[Byte]) : LoadResult[Int] = {
+  def load(stored : ArrayView[Byte]) : LoadResult[Int] = {
     if(stored.length>=4) {
       val i = 
 	      (stored(0) << 24) |

@@ -38,12 +38,12 @@ class ObjectGraph(val root:AnyRef) {
   }
   
   private def serialiseObjects(serialisationFunction: (Any) => Option[Array[Byte]]) = {
-    index.objs.toArray.map { sr => serialiseObject(sr, serialisationFunction) }
+    index.objs.toArray.par.map { sr => serialiseObject(sr, serialisationFunction) }.seq
   }
   
   private def serialiseObject(obj: AnyRef, serialisationFunction: Any => Option[Array[Byte]]): Array[Byte] = {
     val fields = obj.getClass().getDeclaredFields()
-    fields.map(field => serialiseField(serialisationFunction,field, obj)).flatten
+    fields.flatMap(field => serialiseField(serialisationFunction,field, obj))
   }
   
   private def objectFields(obj : AnyRef) : Seq[AnyRef] = {
@@ -52,7 +52,6 @@ class ObjectGraph(val root:AnyRef) {
       f.get(obj)
     }
     anyRefFieldValues.filter(_!=null)
-    
   }
   
   private def serialiseField(serialisationFunction: Any => Option[Array[Byte]],f: Field, obj: Any): Array[Byte] = {

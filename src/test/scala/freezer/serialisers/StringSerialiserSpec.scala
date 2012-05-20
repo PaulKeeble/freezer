@@ -5,7 +5,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 
 @RunWith(classOf[JUnitRunner])
-class StringSerialiserSpec  extends FunSpec with ShouldMatchers{
+class StringSerialiserSpec  extends FunSpec with ShouldMatchers with RoundTrip[String]{
   val serialiser = new StringSerialiser()
   describe("A NullTerminatedStringSerialiser") {
     it("should produce only 1 byte for empty string") {
@@ -29,15 +29,7 @@ class StringSerialiserSpec  extends FunSpec with ShouldMatchers{
       
        val loaded = serialiser.load( stored ++ Array[Byte](0) )
        loaded.result should equal (str)
-       loaded.remaining should equal (Array(0))
+       loaded.remaining ===Array(0)
     }
-  }
-  
-  def roundTrip(str : String) {
-    val stored = serialiser.store(str)
-    val loaded = serialiser.load(stored)
-
-    loaded.result should equal (str)
-    loaded.remaining should equal (Array())
   }
 }

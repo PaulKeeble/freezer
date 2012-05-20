@@ -1,5 +1,6 @@
 package freezer.serialisers
 import freezer.obj.ObjectIndex
+import freezer.collection.ArrayView
 
 class ObjectReferenceSerialiser(val index:ObjectIndex) extends Serialiser[AnyRef]{
   private val intSerialiser = new IntSerialiser
@@ -15,7 +16,7 @@ class ObjectReferenceSerialiser(val index:ObjectIndex) extends Serialiser[AnyRef
     }
   }
   
-  def load(stored : Array[Byte]) : LoadResult[AnyRef] = {
+  def load(stored : ArrayView[Byte]) : LoadResult[AnyRef] = {
     val loadResult = intSerialiser.load(stored)
     if(loadResult.result == NULL)
       return new LoadResult(null,loadResult.remaining)
