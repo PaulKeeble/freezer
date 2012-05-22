@@ -7,7 +7,7 @@ import freezer.collection.OrderedConcurrentSet
 class ObjectIndex extends OrderedConcurrentSet[SystemReference] {
   def equivalent(that:ObjectIndex) = classes == that.classes
   
-  def objs = map { _.obj}
+  def objs = toList.map { _.obj}
   
   def classes = objs.map {_.getClass}
 }

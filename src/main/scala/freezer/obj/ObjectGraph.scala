@@ -8,7 +8,7 @@ import freezer.serialisers.ObjectIndexSerialiser
 class ObjectGraph(val root:AnyRef) {
   def allObjects = {
     var q = new mutable.Queue[AnyRef]
-	var foundObjects = mutable.LinkedHashSet[AnyRef]()
+	var foundObjects = mutable.LinkedHashSet[SystemReference]()
 
 	q.enqueue(root)
     
@@ -21,7 +21,7 @@ class ObjectGraph(val root:AnyRef) {
       }
     }
       
-    foundObjects.toList
+    foundObjects.toList.map{_.obj}
   }
   
   def types = new TypeRegister ++= allObjects.map { _.getClass}
