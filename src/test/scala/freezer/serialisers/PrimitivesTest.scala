@@ -1,81 +1,53 @@
 package freezer.serialisers
+
+import scala.annotation.implicitNotFound
+
 import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
-import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class PrimitivesTest extends FunSpec with ShouldMatchers with NewRoundTrip {
   describe("A Primitives Serialiser") {
-    describe("with a byte") {
+    it("should serialise bytes") {
       implicit val s = Primitives.serialiseByte
       implicit val d = Primitives.deserialiseByte
-
-      it("should store 0") {
-        roundTrip(0.byteValue)
-      }
-
-      it("should store 1") {
-        roundTrip(1.byteValue)
-      }
-
-      it("should store -1 byte value") {
-        roundTrip(-1.byteValue)
-      }
-
-      it("should store min byte value") {
-        roundTrip(Byte.MinValue)
-      }
-
-      it("should store max byte value") {
-        roundTrip(Byte.MaxValue)
-      }
-      
-      ignore("should serialise anyVal byte") {
-//        roundTrip(Primitives.serialise,Primitives.deserialise,1.toByte)
-      }
-
+      roundTripAll(List(-1, 0, 1, Byte.MaxValue, Byte.MinValue,0x01,0x80), { i: Int => i.toByte })
     }
-
-    describe("An IntSerialiser") {
+    
+    it("should serialise ints") {
       implicit val s = Primitives.serialiseInt
       implicit val d = Primitives.deserialiseInt
-
-      it("should save 0") {
-        roundTrip(0)
-      }
-
-      it("should save 1") {
-        roundTrip(1)
-      }
-
-      it("should save -1") {
-        roundTrip(-1)
-      }
-
-      it("should save Integer max value") {
-        roundTrip(Int.MaxValue)
-      }
-
-      it("should save Integer min value") {
-        roundTrip(Int.MinValue)
-      }
-
-      it("should save 01010101 hex") {
-        roundTrip(0x01010101)
-      }
-
-      it("should save 80808080 hex") {
-        roundTrip(0x80808080)
-      }
+      roundTripAll(List(-1, 0, 1, Int.MaxValue, Int.MinValue,0x010101,0x8080))
+    }
+    
+    it("should serialise longs") {
+      implicit val s = Primitives.serialiseLong
+      implicit val d = Primitives.deserialiseLong
+      roundTripAll(List(-1, 0, 1, Long.MaxValue, Long.MinValue,0x0101010101L,0x80808080L))
+    }
+    
+    it("should serialise floats") {
+      implicit val s = Primitives.serialiseFloat
+      implicit val d = Primitives.deserialiseFloat
+      roundTripAll(List(-1, 0, 1, Float.MaxValue, Float.MinValue,-0.1f,0.1f))
     }
 
-    ignore("should compose serialisation to that bytes and ints are done from the same method") {
-      val result = Primitives.serialise(1.toByte)
-      result(0) should equal(1.toByte)
-
-      val intResult = Primitives.serialise(1)
-      result(0) should equal(1)
+    it("should serialise doubles") {
+      implicit val s = Primitives.serialiseDouble
+      implicit val d = Primitives.deserialiseDouble
+      roundTripAll(List(-1, 0, 1, Double.MaxValue, Double.MinValue,-0.1d,0.1d))
     }
+    
+    
+    
+//    ignore("should compose serialisation to that bytes and ints are done from the same method") {
+//      val result = Primitives.serialise(1.toByte)
+//      result(0) should equal(1.toByte)
+//
+//      val intResult = Primitives.serialise(1)
+//      result(0) should equal(1)
+//    }
   }
 }

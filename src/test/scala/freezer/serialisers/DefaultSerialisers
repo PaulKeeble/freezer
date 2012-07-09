@@ -1,0 +1,25 @@
+package freezer.serialisers
+
+object DefaultSerialisers {
+  type Selector[T] = PartialFunction[String,NewDeserialiser[T]]
+  
+  def anyVal: Selector[AnyVal] = {
+    val f : Selector[AnyVal] = (t: String) => {
+      t match {
+        case "byte" => Primitives.deserialiseByte
+        case "int" => Primitives.deserialiseInt
+      }
+    }
+    f
+  }
+  
+  def anySelector :Selector[Any] = {
+    val f : Selector[Any] = (t:String) => {
+      t match {
+        case "byte" => anyVal("byte")
+        case "int" => anyVal("int")
+      }
+    }
+    f
+  }
+}

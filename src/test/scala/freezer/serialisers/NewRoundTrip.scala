@@ -28,4 +28,14 @@ trait NewRoundTrip extends ShouldMatchers {
     case () => "unit"
     case o :AnyRef => o.getClass.getName
   }
+  
+  def roundTripAll[U, T](values: List[U], f: (U) => T)(implicit serialiser: NewSerialiser[T], deserialiser: NewDeserialiser[T]) {
+    roundTripAll( values.map(f(_)) )
+  }
+  
+  def roundTripAll[T](values:List[T])(implicit serialiser: NewSerialiser[T], deserialiser: NewDeserialiser[T]) {
+    values.foreach {
+      v => roundTrip(serialiser,deserialiser,v)
+    }
+  }
 }

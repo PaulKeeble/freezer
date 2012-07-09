@@ -31,16 +31,50 @@ object Primitives {
     }
   }
   
-  val serialise : NewSerialiser[AnyVal] = {  v:AnyVal=> v match {
-      case b : Byte => serialiseByte(b)
-      case i : Int => serialiseInt(i)
-    }
+  val serialiseLong : NewSerialiser[Long] = { l : Long =>
+    Array(
+      (l >>> 56).toByte,
+      (l >>> 48).toByte,
+      (l >>> 40).toByte,
+      (l >>> 32).toByte,
+      (l >>> 24).toByte,
+      (l >>> 16).toByte,
+      (l >>> 8).toByte,
+      l.toByte)
   }
   
-//  val deserialise : NewDeserialiser[AnyVal] = { (a : ArrayView[Byte]) => 
-//    t match {
-//      case "byte" => deserialiseByte(t,a)
-//      case "int" => deserialiseInt(t,a)
-//    }
-//  }
+  val deserialiseLong : NewDeserialiser[Long] = { (a :ArrayView[Byte]) =>
+    if (a.length >= 8) {
+      val i: Long = (a(0) << 56L) |
+        ((a(1) & 0xFF).toLong << 48L) |
+        ((a(2) & 0xFF).toLong << 40L) |
+        ((a(3) & 0xFF).toLong << 32L) |
+        ((a(4) & 0xFF).toLong << 24L) |
+        ((a(5) & 0xFF).toLong << 16L) |
+        ((a(6) & 0xFF).toLong << 8L) |
+        (a(7) & 0xFF)
+
+      new LoadResult(i, a.drop(8))
+    } else {
+      new LoadResult(0L, a)
+    }  
+  }
+  
+  val serialiseFloat : NewSerialiser[Float] = { f : Float =>
+    serialiseInt(java.lang.Float.floatToRawIntBits(f))
+  }
+  
+  val deserialiseFloat : NewDeserialiser[Float] = { (a :ArrayView[Byte]) =>
+    val (i, rest) = deserialiseInt(a)
+    (java.lang.Float.intBitsToFloat(i),rest)
+  }
+  
+  val serialiseDouble : NewSerialiser[Double] = {d: Double =>
+    serialiseLong(java.lang.Double.doubleToRawLongBits(d))
+  }
+  
+  val deserialiseDouble : NewDeserialiser[Double] = { (a:ArrayView[Byte]) =>
+    val (l, rest) = deserialiseLong(a)
+    (java.lang.Double.longBitsToDouble(l),rest)
+  }
 }
