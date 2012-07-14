@@ -10,6 +10,22 @@ object Primitives {
     (a(0),a.drop(1))
   }
   
+  val serialiseShort : NewSerialiser[Short] = { s : Short =>
+    Array((s >>> 8).toByte,
+           s.toByte)
+  }
+  
+  val deserialiseShort : NewDeserialiser[Short] = { (a : ArrayView[Byte]) =>
+    if(a.length>=2) {
+      val s = ((a(0) <<  8) |
+	       (a(1) & 0xFF)).toShort
+	  (s,a.drop(2))
+    }
+    else {
+      (0,a) 
+    }
+  }
+  
   val serialiseInt : NewSerialiser[Int] = { i : Int =>
     Array((i >>> 24).toByte, 
           (i >>> 16).toByte, 
@@ -77,4 +93,37 @@ object Primitives {
     val (l, rest) = deserialiseLong(a)
     (java.lang.Double.longBitsToDouble(l),rest)
   }
+  
+  val serialiseBoolean : NewSerialiser[Boolean] = { f : Boolean =>
+    f match {
+      case true => serialiseInt(1)
+      case false => serialiseInt(0)
+    }
+  }
+  
+  val deserialiseBoolean : NewDeserialiser[Boolean] = { (a :ArrayView[Byte]) =>
+    val (i, rest) = deserialiseInt(a)
+    i match {
+      case 1 => (true,rest)
+      case 0 => (false,rest)
+    }
+  }
+  
+  val serialiseChar : NewSerialiser[Char] = { c : Char=>
+    serialiseShort(c.toShort)
+  }
+  
+  val deserialiseChar : NewDeserialiser[Char] = { (a :ArrayView[Byte]) =>
+    val (s, rest) = deserialiseShort(a)
+    (s.toChar,rest)
+  }
+
+  val serialiseUnit : NewSerialiser[Unit] = { c : Unit=>
+    Array()
+  }
+  
+  val deserialiseUnit : NewDeserialiser[Unit] = { (a :ArrayView[Byte]) =>
+    ((),a)
+  }
+  
 }

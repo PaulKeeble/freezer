@@ -8,7 +8,7 @@ class ArrayView[T](val array:Array[T],val start:Int, val end:Int) {
   lazy val length = end - start
   
   def this(array:Array[T]) = this(array,0,array.length)
-
+  
   def apply(index:Int) = array(start+index)
   
   def drop(x:Int) : ArrayView[T] = new ArrayView(array,start+x,end)

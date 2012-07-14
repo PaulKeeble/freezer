@@ -1,14 +1,14 @@
 package freezer.serialisers
 
 import scala.annotation.implicitNotFound
-
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.FunSpec
+import org.scalatest.Assertions
 
 @RunWith(classOf[JUnitRunner])
-class PrimitivesTest extends FunSpec with ShouldMatchers with NewRoundTrip {
+class PrimitivesTest extends FunSpec with ShouldMatchers with NewRoundTrip with Assertions {
   describe("A Primitives Serialiser") {
     it("should serialise bytes") {
       implicit val s = Primitives.serialiseByte
@@ -20,6 +20,12 @@ class PrimitivesTest extends FunSpec with ShouldMatchers with NewRoundTrip {
       implicit val s = Primitives.serialiseInt
       implicit val d = Primitives.deserialiseInt
       roundTripAll(List(-1, 0, 1, Int.MaxValue, Int.MinValue,0x010101,0x8080))
+    }
+    
+    it("should serialise shorts") {
+      implicit val s = Primitives.serialiseShort
+      implicit val d = Primitives.deserialiseShort
+      roundTripAll(List(-1, 0, 1, Short.MaxValue, Short.MinValue,0x0101,0x8080),{ i: Int => i.toShort})
     }
     
     it("should serialise longs") {
@@ -37,17 +43,28 @@ class PrimitivesTest extends FunSpec with ShouldMatchers with NewRoundTrip {
     it("should serialise doubles") {
       implicit val s = Primitives.serialiseDouble
       implicit val d = Primitives.deserialiseDouble
-      roundTripAll(List(-1, 0, 1, Double.MaxValue, Double.MinValue,-0.1d,0.1d))
+      roundTripAll(List(-1, 0, 1, Double.MaxValue, Double.MinValue,-0.1d,0.1d,
+          Double.NegativeInfinity,Double.MinPositiveValue,Double.PositiveInfinity,Double.NegativeInfinity))
+      val nan = d(s(Double.NaN))
+      assert(java.lang.Double.isNaN(nan._1))
     }
     
+    it("should serialise boolean") {
+      implicit val s = Primitives.serialiseBoolean
+      implicit val d = Primitives.deserialiseBoolean
+      roundTripAll(List(true,false))
+    }
     
+    it("should serialise char") {
+      implicit val s = Primitives.serialiseChar
+      implicit val d = Primitives.deserialiseChar
+      roundTripAll(List(0,'a','A','\u8000','\uFFFF'),{i:Int => i.toChar})
+    }
     
-//    ignore("should compose serialisation to that bytes and ints are done from the same method") {
-//      val result = Primitives.serialise(1.toByte)
-//      result(0) should equal(1.toByte)
-//
-//      val intResult = Primitives.serialise(1)
-//      result(0) should equal(1)
-//    }
+    it("should serialise unit") {
+      implicit val s = Primitives.serialiseUnit
+      implicit val d = Primitives.deserialiseUnit
+      roundTrip(())
+    }
   }
 }
