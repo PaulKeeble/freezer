@@ -28,7 +28,7 @@ class ObjectGraph(val root:AnyRef) {
   
   def index = new ObjectIndex ++= allObjects.map { SystemReference(_)}
   
-  def freeze(serialisationFunction : (Any) => Option[Array[Byte]]): Array[Byte] = {
+  def freeze(serialisationFunction : Any => Array[Byte]): Array[Byte] = {
     val builder = ArrayBuilder.make[Byte]
 
     builder ++= new TypeRegisterSerialiser().store(types)
@@ -37,11 +37,11 @@ class ObjectGraph(val root:AnyRef) {
     builder.result()
   }
   
-  private def serialiseObjects(serialisationFunction: (Any) => Option[Array[Byte]]) = {
+  private def serialiseObjects(serialisationFunction: Any => Array[Byte]) = {
     index.objs.toArray.par.map { sr => serialiseObject(sr, serialisationFunction) }.seq
   }
   
-  private def serialiseObject(obj: AnyRef, serialisationFunction: Any => Option[Array[Byte]]): Array[Byte] = {
+  private def serialiseObject(obj: AnyRef, serialisationFunction: Any => Array[Byte]): Array[Byte] = {
     val fields = obj.getClass().getDeclaredFields()
     fields.flatMap(field => serialiseField(serialisationFunction,field, obj))
   }
@@ -54,14 +54,11 @@ class ObjectGraph(val root:AnyRef) {
     anyRefFieldValues.filter(_!=null)
   }
   
-  private def serialiseField(serialisationFunction: Any => Option[Array[Byte]],f: Field, obj: Any): Array[Byte] = {
+  private def serialiseField(serialisationFunction: Any => Array[Byte],f: Field, obj: Any): Array[Byte] = {
     f.setAccessible(true)
     val value = f.get(obj)
 
-    serialisationFunction(value) match {
-      case Some(x) => x
-      case None => throw new RuntimeException(f.toString() +" could not be serialised as the function has no freezer for it")
-    }
+    serialisationFunction(value)
   }
   
   private def isObject(field :Field, obj : AnyRef) : Boolean = {

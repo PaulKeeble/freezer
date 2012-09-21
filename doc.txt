@@ -33,6 +33,5 @@ Future scope
 Refactor the Deserialisation process so that objects can be done in parallel rather than serially
 Improve performance of index lookup and object index lookup in ObjectIndex
 Add parallel execution to the serialisation process to speed it up
-
 Special cases on interface - null, primitives
 null is dealt with by empty result, primitives punting until later

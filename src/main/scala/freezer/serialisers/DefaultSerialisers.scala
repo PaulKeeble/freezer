@@ -1,13 +1,10 @@
 package freezer.serialisers
 
 import scala.annotation.switch
+import Primitives._
 
 object DefaultSerialisers {
-  type Selector[T] = PartialFunction[String,NewDeserialiser[T]]
-  
-  def serialiseAnyVal(v:AnyVal) = {
-    import Primitives._
-    v match {
+  private val serialisePrimitives : PartialFunction[Any,Array[Byte]] = {
       case b: Byte => serialiseByte(b)
       case s: Short => serialiseShort(s)
       case i: Int => serialiseInt(i)
@@ -18,25 +15,39 @@ object DefaultSerialisers {
       case b: Boolean => serialiseBoolean(b)
       case () => serialiseUnit(())
     }
+  
+  val serialiseAnyVal : NewSerialiser[AnyVal] = (v:AnyVal) => {
+    serialisePrimitives(v)
   }
   
-  def deserialiseAnyVal: Selector[AnyVal] = {
+  val deserialiseAnyVal: Selector[AnyVal] = {
+    import Primitives._
     val f : Selector[AnyVal] = (t: String) => {
       t match {
-        case "byte" => Primitives.deserialiseByte
-        case "int" => Primitives.deserialiseInt
+        case "byte" => deserialiseByte
+        case "short" => deserialiseShort
+        case "int" => deserialiseInt
+        case "long" => deserialiseLong
+        case "float" => deserialiseFloat
+        case "double" => deserialiseDouble
+        case "char" => deserialiseChar
+        case "boolean" => deserialiseBoolean
+        case "unit" => deserialiseUnit
       }
     }
     f
   }
   
-  def deserialiseAnySelector :Selector[Any] = {
-    val f : Selector[Any] = (t:String) => {
-      t match {
-        case "byte" => deserialiseAnyVal("byte")
-        case "int" => deserialiseAnyVal("int")
-      }
+  def composeDeserialiser(deserialiseObjects : Selector[AnyRef]) :Selector[Any] = {
+    deserialiseAnyVal.orElse(deserialiseObjects)
+  }
+  
+  def composeSerialiser(serialiseObjects : NewSerialiser[AnyRef]) : NewSerialiser[Any] = {
+    (v:Any) => {
+      if(serialisePrimitives.isDefinedAt(v))
+        serialiseAnyVal(v.asInstanceOf[AnyVal])
+      else
+        serialiseObjects(v.asInstanceOf[AnyRef])
     }
-    f
   }
 }

@@ -15,6 +15,9 @@ import freezer.obj.SystemReference
 import freezer.serialisers.ObjectIndexSerialiser
 import freezer.serialisers.ObjectReferenceSerialiser
 import freezer.collection.ArrayView
+import freezer.serialisers.DefaultSerialisers
+import freezer.serialisers.Objects
+import freezer.serialisers.Selector
 
 class Freezer {
   def freeze(obj : AnyRef) :Array[Byte] = {
@@ -22,8 +25,7 @@ class Freezer {
     
     val objGraph = new ObjectGraph(obj)
 
-    val serialisationFunction = DefaultInlineSerialisers.serialisePrimitive.
-      orElse({ DefaultInlineSerialisers.serialiseObject(objGraph.index) }).lift
+    val serialisationFunction = DefaultSerialisers.composeSerialiser(Objects.referenceSerialiser(objGraph.index))
 
     objGraph.freeze(serialisationFunction)
   }
@@ -39,25 +41,18 @@ class Freezer {
     
     var remainingBytes = indexResult.remaining
     
-    val deserialiseFunction = DefaultInlineSerialisers.deserialisePrimitive.orElse(DefaultInlineSerialisers.deserialiseObject(objectIndex)).lift
+    val deserialiseFunction = DefaultSerialisers.composeDeserialiser(Objects.selector(Objects.referenceDeserialiser(objectIndex)))
     
     objectIndex.foreach { o =>
       val obj = o.obj
       obj.getClass().getDeclaredFields().foreach { f =>
-        val read = fromBytes(f.getType(),remainingBytes,deserialiseFunction)
+      	val read = deserialiseFunction(f.getType().getName())(remainingBytes)
         
         f.setAccessible(true)
-        f.set(obj,read.result)
-        remainingBytes = read.remaining
+        f.set(obj,read._1)
+        remainingBytes = read._2
       }
     }
     objectIndex.head.obj
-  }
-  
-  private def fromBytes(clazz : Class[_],bytes : ArrayView[Byte],deserialiseFunction : Function[(String,ArrayView[Byte]),Option[LoadResult[Any]]]) : LoadResult[Any]  = {
-    deserialiseFunction(clazz.getName(),bytes) match {
-      case Some(x) => x
-      case None => throw new RuntimeException("Type " + clazz +" not supported")
-    }
   }
 }
