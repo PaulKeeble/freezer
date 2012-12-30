@@ -87,15 +87,40 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
       val end = new DeepObject()
       var current = end
       
-      1 to 10000 foreach { _=>
+      1 to 9999 foreach { _=>
         current = new DeepObject(current)
       }
       val result = roundTrip(current)
-      expect(10001) { result.asInstanceOf[DeepObject].depth}
+      expect(10000) { result.asInstanceOf[DeepObject].depth}
     }
-    //wide shallow graph
+    
+    scenario("wide graph") {
+      def makeTree(ends: List[WideObject]) : List[WideObject] =
+       if(ends.length ==1)
+    	   ends
+       else {
+    	 require(ends.length %8 ==0,ends.length +" length found, must be power of 8")
+    	 
+         val level : List[WideObject] = ends.grouped(8).map { g => new WideObject(g(0),g(1),g(2),g(3),g(4),g(5),g(6),g(7))} toList
+         val tree= makeTree(level)
+         tree
+       }
+      
+      val ends = 1 to 4096 map { _=> new WideObject() } toList
+
+      val top = makeTree(ends)//new WideObject(lvl3(0),lvl3(1),lvl3(2),lvl3(3),lvl3(4),lvl3(5),lvl3(6),lvl3(7))
+      
+      roundTrip(top.head)
+    }
   
-    //same object referenced from two places is a different but shared object
+    scenario("Repeated Object reference") {
+      val repeatedObject = new IntObject(5)
+      val obj = new MultiObject(repeatedObject,repeatedObject)
+      
+      val result = roundTrip(obj).asInstanceOf[MultiObject]
+      
+      result.a should be theSameInstanceAs (result.b)
+    }
   
     //graph with objects having bad hashcode/equals that say they are equal when they aren't
   
@@ -192,4 +217,8 @@ class DeepObject(val o : DeepObject) {
 
 case class MultiObject(val a : AnyRef,val b :AnyRef) {
   def this() = this(null,null)
+}
+
+case class WideObject(a : WideObject,b : WideObject,c:WideObject,d:WideObject,e:WideObject,f:WideObject,g:WideObject,h:WideObject) {
+  def this() = this(null,null,null,null,null,null,null,null)
 }
