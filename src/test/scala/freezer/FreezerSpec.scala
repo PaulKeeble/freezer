@@ -30,15 +30,25 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
       roundTrip(new LongObject(1))
     }
     
-    //short
+    scenario("short") {
+      roundTrip(new ShortObject(1))
+    }
     
-    //float
+    scenario("float") {
+      roundTrip(new FloatObject(1.1f))
+    }
     
-    //double
+    scenario("double") {
+      roundTrip(new DoubleObject(1.1d))
+    }
     
-    //char
-    
-    //multiple primitives
+    scenario("char") {
+      roundTrip(new CharObject('c'))
+    }
+
+    scenario("multiple primitives") {
+      roundTrip(new MultiplePrimitivesObject(b=1,s=2,i=3,l=4,f=1.1f,d=2.2d,c='g'))
+    }
   }
 
   feature("Freezing Arrays") {
@@ -122,6 +132,26 @@ case class LongObject(val i:Long) {
 
 case class ByteObject(val i:Byte) {
   def this() = this(0)
+}
+
+case class ShortObject(val i:Short) {
+  def this() = this(0)
+}
+
+case class FloatObject(val i:Float) {
+  def this() = this(0.0f)
+}
+
+case class DoubleObject(val i:Double) {
+  def this() = this(0.0d)
+}
+
+case class CharObject(val i:Char) {
+  def this() = this('a')
+}
+
+case class MultiplePrimitivesObject(b:Byte,s:Short,i:Int,l:Long,f:Float,d:Double,c:Char) {
+  def this() = this(0,0,0,0,0.0f,0.0d,'a')
 }
 
 case class ObjectObject(val o:IntObject) {
