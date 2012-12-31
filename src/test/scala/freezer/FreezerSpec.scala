@@ -24,6 +24,10 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
     scenario("byte") {
       roundTrip(new ByteObject(1))
     }
+        
+    scenario("short") {
+      roundTrip(new ShortObject(1))
+    }
     
     scenario("int") {
       roundTrip(new IntObject(1))
@@ -31,10 +35,6 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
     
     scenario("long") {
       roundTrip(new LongObject(1))
-    }
-    
-    scenario("short") {
-      roundTrip(new ShortObject(1))
     }
     
     scenario("float") {
@@ -48,28 +48,32 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
     scenario("char") {
       roundTrip(new CharObject('c'))
     }
+    
+    scenario("boolean") {
+      roundTrip(new BooleanObject(true))
+    }
 
     scenario("multiple primitives") {
       roundTrip(new MultiplePrimitivesObject(b=1,s=2,i=3,l=4,f=1.1f,d=2.2d,c='g'))
     }
     
     //scala enumerations
+    
+    //unit
   
     //java enumerations
   }
 
   feature("Freezing Arrays") {
-  	//store an array as a field from an object
+    //store a single dimensional int array
+    
+    //store a single dimensional float array
+    
+    //double, long, short, byte, char, boolean, unit array
+    
+    //an array containing other arrays
   
   	//store an array as primary object
-  
-    //array with primitives
-
-    //2 dimension array
-
-    //3 dimension array
-
-    //multidimension array with different lengths using Objects
   }
   
   feature("Freezing collections") {
@@ -196,6 +200,10 @@ case class LongObject(val i:Long) {
 
 case class ByteObject(val i:Byte) {
   def this() = this(0)
+}
+
+case class BooleanObject(val i:Boolean) {
+  def this() = this(false)
 }
 
 case class ShortObject(val i:Short) {
