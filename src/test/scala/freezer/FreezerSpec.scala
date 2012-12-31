@@ -7,6 +7,9 @@ import org.scalatest.junit.JUnitRunner
 import scala.util.control.TailCalls.TailRec
 import scala.annotation.tailrec
 import org.scalatest.matchers.ShouldMatchers
+import scala.util.Random
+import freezer.serialisers.NoDefaultConstructor
+import freezer.serialisers.NoDefaultConstructorException
 
 @RunWith(classOf[JUnitRunner])
 class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
@@ -49,6 +52,10 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
     scenario("multiple primitives") {
       roundTrip(new MultiplePrimitivesObject(b=1,s=2,i=3,l=4,f=1.1f,d=2.2d,c='g'))
     }
+    
+    //scala enumerations
+  
+    //java enumerations
   }
 
   feature("Freezing Arrays") {
@@ -63,6 +70,12 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
     //3 dimension array
 
     //multidimension array with different lengths using Objects
+  }
+  
+  feature("Freezing collections") {
+    //Java lists, sets, maps
+  
+    //Scala lists, sets, maps
   }
   
   feature("Freezing object graphs") {
@@ -122,27 +135,53 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
       result.a should be theSameInstanceAs (result.b)
     }
   
-    //graph with objects having bad hashcode/equals that say they are equal when they aren't
+    scenario("Always equal objects") {
+      val obj = new MultiObject(new AlwaysEqualObject,new AlwaysEqualObject)
+      
+      val result = roundTrip(obj).asInstanceOf[MultiObject]
+      
+      result.a should not be theSameInstanceAs (result.b)
+    }
+    
+    scenario("Always not equal objects") {
+      val misbehaved = new AlwaysNotEqualObject
+      val obj = new MultiObject(misbehaved,misbehaved)
+      
+      val result = roundTripNoCheck(obj).asInstanceOf[MultiObject]
+      
+      result.a should be theSameInstanceAs (result.b)
+    }
   
-    //no accessible no arg constructor
+    scenario("Missing a no arg constructor") {
+      val obj = new NoZeroArgConstructorObject(5)
+
+      intercept[NoDefaultConstructorException] {
+        roundTrip(obj)
+      }
+    }
+  }
   
-    //Java lists, sets, maps
+  feature("attribute serialisation properties") {
+    //comply with transient
+    
+    //Serial UID?
+  }
   
-    //Scala lists, sets, maps
-  
-    //scala enumerations
-  
-    //java enumerations
-  
+  feature("Freezer API") {
     //run parallel using the same Freezer
     
-    //comply with transient
+    //custom serialiser
   }
   
   def roundTrip(testObject : AnyRef) : AnyRef = {
-      val stored = freezer.freeze(testObject)
-      val result = freezer.unfreeze(stored)
+      val result = roundTripNoCheck(testObject)
       testObject should equal(result)
+      result
+  }
+  
+  def roundTripNoCheck(testObject:AnyRef) : AnyRef = {
+    val stored = freezer.freeze(testObject)
+      val result = freezer.unfreeze(stored)
       result
   }
 }
@@ -183,6 +222,8 @@ case class ObjectObject(val o:IntObject) {
   def this() = this(null)
 }
 
+case class NoZeroArgConstructorObject(val i:Int)
+
 class DeepObject(val o : DeepObject) {
   def this() = this(null)
   
@@ -217,6 +258,16 @@ class DeepObject(val o : DeepObject) {
 
 case class MultiObject(val a : AnyRef,val b :AnyRef) {
   def this() = this(null,null)
+}
+
+case class AlwaysEqualObject() {
+  override def equals(other:Any) = true
+  override def hashCode = 7
+}
+
+case class AlwaysNotEqualObject() {
+  override def equals(other:Any) = false
+  override def hashCode = Random.nextInt
 }
 
 case class WideObject(a : WideObject,b : WideObject,c:WideObject,d:WideObject,e:WideObject,f:WideObject,g:WideObject,h:WideObject) {
