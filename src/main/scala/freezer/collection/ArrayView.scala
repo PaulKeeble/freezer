@@ -2,6 +2,8 @@ package freezer.collection
 
 import math.{max,min}
 import scala.compat.Platform
+import scala.reflect.ClassTag
+import scala.language.implicitConversions
 
 class ArrayView[T](val array:Array[T],val start:Int, val end:Int) {
   
@@ -17,7 +19,7 @@ class ArrayView[T](val array:Array[T],val start:Int, val end:Int) {
   
   def splitAt(idx:Int) : (ArrayView[T],ArrayView[T]) =(take(idx),drop(idx))
   
-  def toArray(implicit mf :ClassManifest[T]) : Array[T] = {
+  def toArray(implicit mf :ClassTag[T]) : Array[T] = {
     val len = length
     val clone = new Array[T](len)
     Platform.arraycopy(array,start,clone,0,len)
@@ -28,5 +30,5 @@ class ArrayView[T](val array:Array[T],val start:Int, val end:Int) {
 object ArrayView {
   implicit def arrayToView[T](a:Array[T]) :ArrayView[T] = new ArrayView(a)
   
-  implicit def viewToArray[T](view:ArrayView[T])(implicit mf : ClassManifest[T]) : Array[T] = view.toArray
+  implicit def viewToArray[T](view:ArrayView[T])(implicit mf : ClassTag[T]) : Array[T] = view.toArray
 }

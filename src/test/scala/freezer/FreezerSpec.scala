@@ -100,7 +100,7 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
     }
     
     scenario("deep graph") {
-      given("A deep object graph")
+      Given("A deep object graph")
       val end = new DeepObject()
       var current = end
       
@@ -108,7 +108,7 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
         current = new DeepObject(current)
       }
       val result = roundTrip(current)
-      expect(10000) { result.asInstanceOf[DeepObject].depth}
+      assertResult(10000) { result.asInstanceOf[DeepObject].depth}
     }
     
     scenario("wide graph") {
@@ -118,12 +118,12 @@ class FreezerSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers {
        else {
     	 require(ends.length %8 ==0,ends.length +" length found, must be power of 8")
     	 
-         val level : List[WideObject] = ends.grouped(8).map { g => new WideObject(g(0),g(1),g(2),g(3),g(4),g(5),g(6),g(7))} toList
+         val level : List[WideObject] = ends.grouped(8).map { g => new WideObject(g(0),g(1),g(2),g(3),g(4),g(5),g(6),g(7))} .toList
          val tree= makeTree(level)
          tree
        }
       
-      val ends = 1 to 4096 map { _=> new WideObject() } toList
+      val ends = (1 to 4096).map { _=> new WideObject() } .toList
 
       val top = makeTree(ends)//new WideObject(lvl3(0),lvl3(1),lvl3(2),lvl3(3),lvl3(4),lvl3(5),lvl3(6),lvl3(7))
       

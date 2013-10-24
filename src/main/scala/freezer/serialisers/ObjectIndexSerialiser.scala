@@ -59,7 +59,7 @@ class ObjectIndexSerialiser(private val types :TypeRegister) extends Serialiser[
 	    con.setAccessible(true)
 	    con.newInstance(emptyObj:_*).asInstanceOf[AnyRef]
     } catch {
-      case _ => throw new NoDefaultConstructorException(clazz+" does not have a no argument constructor, can't create instance")
+      case _ : Exception => throw new NoDefaultConstructorException(clazz+" does not have a no argument constructor, can't create instance")
     }
   }
 }

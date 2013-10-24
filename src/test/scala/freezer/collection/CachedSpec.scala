@@ -41,7 +41,7 @@ class CachedSpec extends FunSpec with ShouldMatchers {
     it("should be consistent under multithread usage") {
       var count = 0
       val c = new Cached[Int]( count ) 
-      val results = (1 to 1000 par).map { i =>
+      val results = ((1 to 1000).par).map { i =>
         count+=1
         c.reset()
         c()

@@ -1,5 +1,7 @@
 package freezer.obj
 
+import scala.language.implicitConversions
+
 class SystemReference(val obj: AnyRef) {
   override def hashCode = System.identityHashCode(obj)
 
